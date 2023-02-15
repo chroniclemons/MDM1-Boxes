@@ -9,8 +9,8 @@ def create_grid(grid_width,grid_length, window):        # Creates the template f
     
     window.screensize(IMAGE.len + 100, IMAGE.wid + 100)
     window.bgcolor("white")
-    IMAGE.draw_roll()
-    IMAGE.draw_grid()
+    
+    
     
     return np.zeros((grid_width, grid_length))
 
@@ -23,8 +23,8 @@ def draw_net(net, grid_x_pos, grid_y_pos , grid, colour):       # Draw a given n
         for x in y:
             N += 1
             if x == 1:
-               
-                M += 1
+                IMAGE.colour_square( grid_x_pos + N, grid_y_pos + M, net, colour)
+        M += 1
         
 
 
@@ -123,11 +123,15 @@ BOARD_WIDTH = 12
 efficiencies = []
 
 
-for i in range(1):  # Prints out the optimised board layouts for each individual net
-    print("Computing net",i+1)    
+for i in range(4):  # Prints out the optimised board layouts for each individual net
+    print("Computing net",i+1)       
+    main(all_nets[i], window)
+    IMAGE.draw_grid()
+    IMAGE.draw_roll()
     window = turtle.Screen()
-    main(all_nets[i], window)  
-    IMAGE.save_image(window, i+1)        
+    window.screensize(IMAGE.len + 100, IMAGE.wid + 100) 
+    IMAGE.save_image(window, i+1)
+    window.clear()
     print("")
        
 
