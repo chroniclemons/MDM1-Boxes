@@ -1,30 +1,30 @@
 from allnets import *
 import box_drawer as bd
 import turtle
+import math
 window = turtle.Screen()
-def create_grid(grid_width,grid_length, window):        # Creates the template for the roller
-    global IMAGE #sorry
-    
-    IMAGE = bd.draw_it(grid_width, grid_length)
-    
-    window.screensize(IMAGE.len + 100, IMAGE.wid + 100)
-    window.bgcolor("white")
-    
-    
-    
+def create_grid(grid_width,grid_length, window, draw):        # Creates the template for the roller
+    if draw:
+        global IMAGE #sorry       
+        IMAGE = bd.draw_it(grid_width, grid_length)        
+        window.screensize(IMAGE.len + 100, IMAGE.wid + 100)
+        window.bgcolor("white")  
     return np.zeros((grid_width, grid_length))
 
-def draw_net(net, grid_x_pos, grid_y_pos , grid, colour):       # Draw a given net at a given position
+def draw_net(net, grid_x_pos, grid_y_pos , grid, colour, draw):       # Draw a given net at a given position
     for row in range(len(net)):
         grid[ grid_y_pos + row , [x for x in range(grid_x_pos, grid_x_pos + len(net[row]) )] ] += net[row]
-    M = 0   
-    for y in net[0:len(net)]:
-        N = 0
-        for x in y:
-            N += 1
-            if x == 1:
-                IMAGE.colour_square( grid_x_pos + N, grid_y_pos + M, net, colour)
-        M += 1
+    if draw:
+        M = 0   
+        for y in net[0:len(net)]:
+            N = 0
+            for x in y:
+                N += 1
+                if x == 1:
+                    IMAGE.colour_square( grid_x_pos + N, grid_y_pos + M, net, colour)
+            M += 1
+    else:
+        return
         
 
 
@@ -91,8 +91,8 @@ def best_grid(list_of_efficiencies):    # Finds the layouts with the best effici
     return best_grids, max
 
 
-def main(net, window):
-    board = create_grid(BOARD_WIDTH, BOARD_LENGTH, window)
+def main(net, window, draw):
+    board = create_grid(BOARD_WIDTH, BOARD_LENGTH, window, draw)
     colours = ['blue', 'red', 'orange','yellow', 'purple','green']
     ctr = 0      #counter to help turtle <3    
     nets_drawn = 0  # Counts the number of
@@ -101,14 +101,14 @@ def main(net, window):
         for y in range( 0 , BOARD_WIDTH ):
 
             if x == 0 and y == 0:       # Automatically draw a net at (0,0)
-                draw_net(net,0,0,board, colours[ctr & 6])
+                draw_net(net,0,0,board, colours[ctr & 6], draw)
                 ctr += 1
                 #print(board)
                 #print("")
 
             else:
                 if not valid_location(net, x, y, board):
-                    draw_net(net, x, y, board, colours[ctr % 6])
+                    draw_net(net, x, y, board, colours[ctr % 6], draw)
                     nets_drawn += 1
                     ctr += 1
                     #print(board)
@@ -119,24 +119,33 @@ def main(net, window):
 
 
 BOARD_LENGTH = 20
-BOARD_WIDTH = 12
+draw = False
 efficiencies = []
 
+def run_computations(all_nets, window, w, draw):
+    for i in range(len(all_nets)):  # Prints out the optimised board layouts for each individual net
+        print("Computing net",i+1)       
+        main(all_nets[i], window, draw)
+        if draw:
+            IMAGE.draw_grid()
+            IMAGE.draw_roll()
+            window = turtle.Screen()
+            window.screensize(IMAGE.len + 100, IMAGE.wid + 100) 
+            IMAGE.save_image(window, i+1, w)
+            window.clear()
+        else:
+            continue
+        print("")
 
-for i in range(4):  # Prints out the optimised board layouts for each individual net
-    print("Computing net",i+1)       
-    main(all_nets[i], window)
-    IMAGE.draw_grid()
-    IMAGE.draw_roll()
-    window = turtle.Screen()
-    window.screensize(IMAGE.len + 100, IMAGE.wid + 100) 
-    IMAGE.save_image(window, i+1)
-    window.clear()
-    print("")
-       
-
+for w in range(6,17):
+    BOARD_WIDTH = w       
+    run_computations(all_nets, window, 16, draw)
+    
 best_nets , best_efficiency = best_grid(efficiencies)
 print("The most efficient layout(s) (",best_efficiency,"% )",":")
 
 for i in best_nets:
-    print("Net",i)
+    if i % 44 == 0 :
+        print("Net 44")
+    else:
+        print("Net "+ str(i % 44))

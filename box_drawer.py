@@ -1,7 +1,7 @@
 
 import turtle
 from PIL import Image
-
+import os
 
 # Class to better viaually represent the roll
 class draw_it():
@@ -74,7 +74,8 @@ class draw_it():
         bruh.hideturtle()
         
 
-    def save_image(self, window, i):
+    def save_image(self, window, i, w):  
+        os.chdir('C:/Users/Josh/Desktop/MDM1/attempt 2/Rolls/' + str(w) + 'x20 grid')
         window.getcanvas().postscript(file='Net ' + str(i) +' Roll.jpg')
         img = Image.open('Net '+str(i)+' Roll.jpg') 
-        img.save('Net '+str(i)+' Roll.jpg')  
+        img.save('Net '+str(i)+' Roll.jpg')
